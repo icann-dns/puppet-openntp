@@ -9,11 +9,16 @@ class openntp (
   String                                           $group,
   Stdlib::Absolutepath                             $config_file,
   String                                           $template,
+  Boolean                                          $sync_immediately,
   Optional[Variant[Enum['*'], Stdlib::Ip_address]] $listen = undef,
 ) {
 
   ensure_packages([$package])
-  if $::facts['os']['id'] == 'Ubuntu' {
+  $etc_default_openntpd = $sync_immediately ? {
+    true    => "DAEMON_OPTS=\"-f ${config_file} -s\"",
+    default => "DAEMON_OPTS=\"-f ${config_file}\"",
+  }
+  if $::facts['os']['family'] == 'Debian' {
     # https://bugs.launchpad.net/ubuntu/+source/openntpd/+bug/458061
     package {'ntp':
       ensure => purged,
@@ -25,6 +30,15 @@ class openntp (
       refreshonly => true,
       subscribe   => Package['ntp'],
       before      => Package[$package],
+    }
+    file {'/etc/default/openntpd':
+      ensure  => file,
+      content => $etc_default_openntpd,
+    }
+  } elsif $::facts['os']['family'] == 'FreeBSD' and $sync_immediately {
+    file_line {'sync time immediately':
+      path => '/etc/rc.conf',
+      line => 'openntpd_flags="-s"',
     }
   }
   file {$config_file:

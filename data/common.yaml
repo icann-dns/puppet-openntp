@@ -1,4 +1,4 @@
-#openntp::listen: null
+openntp::listen: ~
 openntp::enable: true
 openntp::server:
 - 0.pool.ntp.org
@@ -11,4 +11,4 @@ openntp::config_file: /etc/openntpd/ntpd.conf
 openntp::owner: root
 openntp::group: root
 openntp::template: openntp/ntpd.conf.erb
-
+openntp::sync_immediately: false
