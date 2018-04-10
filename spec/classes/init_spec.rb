@@ -15,14 +15,11 @@ describe 'openntp' do
       it { should contain_file(config_file).with_ensure('file') }
       it { should contain_file(config_file).with_owner('root') }
       it { should contain_file(config_file).without_content(/listen on/) }
-      it { should contain_file(config_file).with_content(/server 0.debian.pool.ntp.org/) }
-      it { should contain_file(config_file).with_content(/server 1.debian.pool.ntp.org/) }
-      it { should contain_file(config_file).with_content(/server 2.debian.pool.ntp.org/) }
-      it { should contain_file(config_file).with_content(/server 3.debian.pool.ntp.org/) }
+      it { should contain_file(config_file).with_content(/server 0.pool.ntp.org/) }
+      it { should contain_file(config_file).with_content(/server 1.pool.ntp.org/) }
+      it { should contain_file(config_file).with_content(/server 2.pool.ntp.org/) }
+      it { should contain_file(config_file).with_content(/server 3.pool.ntp.org/) }
     end
-
-    it_behaves_like 'a default setup'
-    it { should_not contain_file('/usr/local/sbin/restart-openntpd') }
 
     describe 'on Debian' do
       let(:facts) { {
@@ -33,7 +30,6 @@ describe 'openntp' do
       it_behaves_like 'a default setup'
 
       it { should contain_file(config_file).with_group('root') }
-      it { should contain_file('/usr/local/sbin/restart-openntpd') }
     end
 
     describe 'on FreeBSD' do
@@ -43,25 +39,8 @@ describe 'openntp' do
       } }
       let(:config_file) { '/usr/local/etc/ntpd.conf' }
 
-      it_behaves_like 'a default setup'
-
       it { should contain_file(config_file).with_group('wheel') }
-      it { should_not contain_file('/usr/local/sbin/restart-openntpd') }
     end
-  end
-
-  describe 'with custom version' do
-    let(:params) { {:ensure => '1.0.0'} }
-
-    it { should contain_package('openntpd').with_ensure('1.0.0') }
-  end
-
-  describe 'with ensure absent' do
-    let(:params) { {:ensure => 'absent'} }
-
-    it { should contain_package('openntpd').with_ensure('absent') }
-    it { should contain_file(config_file).with_ensure('absent') }
-    it { should_not contain_service('openntpd') }
   end
 
   describe 'with listen on any interface' do

@@ -1,73 +1,43 @@
 # = Class: openntp
 #
-# Manages the OpenNTP server.
-#
-# == Parameters
-#
-# [*ensure*]
-#   What state the package should be in. Passed through to package resource.
-#
-# [*enable*]
-#   Set to 'false' to disable service(s) managed by module.
-#
-# [*listen*]
-#   Addresses to listen on (ntpd does not listen by default).
-#   Examples: nil, *, 127.0.0.1, ::1
-#
-# [*server*]
-#   An array of time servers to be used.
-#   Example: ['ntp.example.org']
-#
-# [*package_name*]
-#   Set the name of the package to be installed.
-#
-# [*service_name*]
-#   Set the name of the openntpd service.
-#
-# [*service_restart*]
-#   Set the command used to restart the service. If set to `undef`, the Puppet default will be used. Otherwise the
-#   referenced command is used. Used to provide a custom restart command that ensures the service is properly restarted.
-#
-# [*config_file*]
-#   Set the path of the configuration file.
-#
-# [*template*]
-#   Set to the name of an alternative template file (if you don't want to use the default one).
-#
-# [*options_hash*]
-#   Used in combination with a custom `template` to provide custom data.
-#
-# == Author
-#
-# Martin Meinhold <Martin.Meinhold@gmx.de>
-#
-# === Copyright
-#
-# Copyright 2014 Martin Meinhold, unless otherwise noted.
-#
 class openntp (
-  $ensure          = $openntp::params::ensure,
-  $enable          = $openntp::params::enable,
-  $listen          = undef,
-  $server          = $openntp::params::server,
-  $package_name    = $openntp::params::package_name,
-  $service_name    = $openntp::params::service_name,
-  $service_restart = $openntp::params::service_restart,
-  $config_file     = $openntp::params::config_file,
-  $template        = undef,
-  $options_hash    = { },
-) inherits openntp::params {
+  Optional[Variant[Enum['*'], Stdlib::Ip_address]] $listen,
+  Boolean                                          $enable,
+  Array[Stdlib::Host]                              $server,
+  String                                           $package,
+  String                                           $service,
+  String                                           $owner,
+  String                                           $group,
+  Stdlib::Absolutepath                             $config_file,
+  Tea::Puppetcontent                               $template,
+) {
 
-  validate_string($ensure)
-  validate_bool($enable)
-  validate_array($server)
-  validate_string($package_name)
-  validate_absolute_path($config_file)
-  validate_string($service_name)
-  validate_hash($options_hash)
-
-  class { 'openntp::install': } ->
-  class { 'openntp::config': } ~>
-  class { 'openntp::service': }
-
+  ensure_package([$package])
+  if $facts['os']['id'] == 'Ubuntu' {
+    # https://bugs.launchpad.net/ubuntu/+source/openntpd/+bug/458061
+    package {'ntp':
+      ensure => purged,
+      before => Package[$package],
+    }
+    exec { 'reload app armor':
+      command     => '/usr/sbin/service apparmor reload',
+      onlyif      => '/usr/bin/test -x /sbin/apparmor_parser',
+      refreshonly => true,
+      subscribe   => Package['ntp'],
+      before      => Package[$package],
+    }
+  }
+  file {$config_file:
+    ensure  => file,
+    content => template($template),
+    owner   => $owner,
+    group   => $group,
+    mode    => '0644',
+    require => Package[$package],
+  }
+  service {$service:
+    ensure  => $enable,
+    enable  => $enable,
+    require => [Package[$package], File[$config_file]],
+  }
 }
