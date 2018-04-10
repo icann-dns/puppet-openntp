@@ -38,7 +38,8 @@ class openntp (
       notify  => Service[$service],
     }
     service {'hwclock.sh':
-      enable => $enable_hwclock,
+      enable   => $enable_hwclock,
+      provider => init,
     }
   } elsif $::facts['os']['family'] == 'FreeBSD' and $sync_immediately {
     file_line {'sync time immediately':
