@@ -1,2 +1,2 @@
 openntp::config_file: /usr/local/etc/ntpd.conf
-openntp::rootgroup: wheel
+openntp::group: wheel
