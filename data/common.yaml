@@ -1,0 +1,14 @@
+openntp::listen: ~
+openntp::enable: true
+openntp::server:
+- 0.pool.ntp.org
+- 1.pool.ntp.org
+- 2.pool.ntp.org
+- 3.pool.ntp.org
+openntp::package: openntpd
+openntp::service: openntpd
+openntp::config_file: /etc/openntpd/ntpd.conf
+openntp::owner: root
+openntp::group: root
+openntp::template: openntp/ntpd.conf.erb
+
