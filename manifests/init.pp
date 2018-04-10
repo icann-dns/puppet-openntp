@@ -34,11 +34,13 @@ class openntp (
     file {'/etc/default/openntpd':
       ensure  => file,
       content => $etc_default_openntpd,
+      notify  => Service[$service],
     }
   } elsif $::facts['os']['family'] == 'FreeBSD' and $sync_immediately {
     file_line {'sync time immediately':
-      path => '/etc/rc.conf',
-      line => 'openntpd_flags="-s"',
+      path   => '/etc/rc.conf',
+      line   => 'openntpd_flags="-s"',
+      notify => Service[$service],
     }
   }
   file {$config_file:
