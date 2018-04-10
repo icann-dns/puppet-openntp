@@ -1,4 +1,4 @@
-openntp::listen: ~
+#openntp::listen: null
 openntp::enable: true
 openntp::server:
 - 0.pool.ntp.org

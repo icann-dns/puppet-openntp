@@ -1,7 +1,6 @@
 # = Class: openntp
 #
 class openntp (
-  Optional[Variant[Enum['*'], Stdlib::Ip_address]] $listen,
   Boolean                                          $enable,
   Array[Stdlib::Host]                              $server,
   String                                           $package,
@@ -9,11 +8,12 @@ class openntp (
   String                                           $owner,
   String                                           $group,
   Stdlib::Absolutepath                             $config_file,
-  Tea::Puppetcontent                               $template,
+  String                                           $template,
+  Optional[Variant[Enum['*'], Stdlib::Ip_address]] $listen = undef,
 ) {
 
-  ensure_package([$package])
-  if $facts['os']['id'] == 'Ubuntu' {
+  ensure_packages([$package])
+  if $::facts['os']['id'] == 'Ubuntu' {
     # https://bugs.launchpad.net/ubuntu/+source/openntpd/+bug/458061
     package {'ntp':
       ensure => purged,
