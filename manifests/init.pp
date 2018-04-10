@@ -10,6 +10,7 @@ class openntp (
   Stdlib::Absolutepath                             $config_file,
   String                                           $template,
   Boolean                                          $sync_immediately,
+  Boolean                                          $enable_hwclock,
   Optional[Variant[Enum['*'], Stdlib::Ip_address]] $listen = undef,
 ) {
 
@@ -35,6 +36,9 @@ class openntp (
       ensure  => file,
       content => $etc_default_openntpd,
       notify  => Service[$service],
+    }
+    service {'hwclock.sh':
+      enable => $enable_hwclock,
     }
   } elsif $::facts['os']['family'] == 'FreeBSD' and $sync_immediately {
     file_line {'sync time immediately':

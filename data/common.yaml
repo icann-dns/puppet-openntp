@@ -12,3 +12,4 @@ openntp::owner: root
 openntp::group: root
 openntp::template: openntp/ntpd.conf.erb
 openntp::sync_immediately: false
+openntp::enable_hwclock: false
