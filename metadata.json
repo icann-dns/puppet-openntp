@@ -1,6 +1,6 @@
 {
   "name": "tohuwabohu-openntp",
-  "version": "2.3.1",
+  "version": "3.0.01",
   "author": "Martin Meinhold",
   "license": "Apache-2.0",
   "summary": "Puppet module for OpenNTPD",
@@ -23,8 +23,8 @@
     {
       "operatingsystem": "Ubuntu",
       "operatingsystemrelease": [
-        "12.04",
-        "14.04"
+        "14.04",
+        "16.04"
       ]
     },
     {
