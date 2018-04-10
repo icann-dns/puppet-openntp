@@ -1,5 +1,5 @@
 # This file is managed by Puppet
-<% if @listen and @listen.to_s.length > 0 -%>
+<% if @listen -%>
 listen on <%= @listen %>
 <% end -%>
 <% @server.each do |entry| -%>
